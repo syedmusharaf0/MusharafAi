@@ -1,30 +1,40 @@
 import openai
 import streamlit as st
-import gradio as gr
 import pyttsx3
 import speech_recognition as sr
 from PIL import Image
+import os
+from dotenv import load_dotenv
 
-# Set your OpenAI API key
-openai.api_key = "YOUR_OPENAI_API_KEY"
+# Load environment variables from .env file
+load_dotenv()
+
+# Set your OpenAI API key from environment variable
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Function to generate response from GPT-4
 def generate_text(prompt):
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=150
-    )
-    return response.choices[0].text.strip()
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=150
+        )
+        return response.choices[0].text.strip()
+    except openai.error.OpenAIError as e:
+        return f"Error: {str(e)}"
 
 # Function to generate image based on prompt
 def generate_image(prompt):
-    response = openai.Image.create(
-        prompt=prompt,
-        n=1,
-        size="1024x1024"
-    )
-    return response['data'][0]['url']
+    try:
+        response = openai.Image.create(
+            prompt=prompt,
+            n=1,
+            size="1024x1024"
+        )
+        return response['data'][0]['url']
+    except openai.error.OpenAIError as e:
+        return f"Error generating image: {str(e)}"
 
 # Function to handle audio input and convert it to text
 def listen_to_audio():
@@ -74,4 +84,3 @@ if image_input:
 if audio_input:
     response = assistant(audio_input=True)
     st.text_area("Audio Response:", value=response, height=200)
-
