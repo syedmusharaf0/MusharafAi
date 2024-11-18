@@ -1,0 +1,6 @@
+openai
+streamlit
+pyttsx3
+SpeechRecognition
+Pillow
+python-dotenv
